@@ -24,6 +24,9 @@
   <div id="container"></div>
 
   <script>
+    document.onpageshow = () => console.log('show')
+    document.onpagehide = () => console.log('hide')
+    document.visibilitychange = () => console.log('visibilitychange')
     /**
    * 阻止 iOS 微信小程序环境下
    * wxMuteBackgroundMedia 触发的 video.pause()
@@ -44,67 +47,55 @@
         return;
       }
 
-      if (!window.WeixinJSBridge || !WeixinJSBridge.invoke) {
-        document.addEventListener('WeixinJSBridgeReady', ready, false)
-      } else {
-        ready()
+      const proto = HTMLMediaElement.prototype;
+
+      // 避免重复 patch
+      if (proto.__wx_pause_patched__) {
+        return;
       }
 
-      function ready() {
-        let active = true
+      proto.__wx_pause_patched__ = true;
 
-        WeixinJSBridge.on('onPageStateChange', function (res) {
-          console.log('res is active', res.active)
-          active = res.active
-        })
+      const originalPause = proto.pause;
 
-        const proto = HTMLMediaElement.prototype;
+      proto.pause = function (...args) {
 
-        // 避免重复 patch
-        if (proto.__wx_pause_patched__) {
-          return;
+        let stack = '';
+
+        try {
+          stack = new Error().stack || '';
+        } catch (e) { }
+
+        setTimeout(() => {
+          console.log(stack, document.visibilityState)
+        }, 2000);
+
+        /**
+         * 微信内部：
+         * wxMuteBackgroundMedia
+         */
+        const isWxInternalPause =
+          stack.includes('wxMuteBackgroundMedia');
+
+        if (isWxInternalPause) {
+
+          console.warn(
+            '[preventWxAutoPause] blocked wx auto pause',
+            this
+          );
+
+          // 阻止微信暂停
+          return Promise.resolve();
         }
 
-        proto.__wx_pause_patched__ = true;
-
-        const originalPause = proto.pause;
-
-        proto.pause = function (...args) {
-
-          let stack = '';
-
-          try {
-            stack = new Error().stack || '';
-          } catch (e) { }
-
-          console.log(stack, active)
-
-          /**
-           * 微信内部：
-           * wxMuteBackgroundMedia
-           */
-          const isWxInternalPause =
-            stack.includes('wxMuteBackgroundMedia');
-
-          if (isWxInternalPause) {
-
-            console.warn(
-              '[preventWxAutoPause] blocked wx auto pause',
-              this
-            );
-
-            // 阻止微信暂停
-            return Promise.resolve();
-          }
-
-          return originalPause.apply(this, args);
-        };
-      }
+        return originalPause.apply(this, args);
+      };
     }
   </script>
 
   <script>
     preventWxAutoPause()
+
     var mup = muduPlayer("container");
 
     mup.setup({
