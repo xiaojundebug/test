@@ -16,7 +16,6 @@
       width: 100%;
       height: 300px;
     }
-
   </style>
 </head>
 
@@ -26,9 +25,9 @@
 
   <script>
     /**
- * 阻止 iOS 微信小程序环境下
- * wxMuteBackgroundMedia 触发的 video.pause()
- */
+   * 阻止 iOS 微信小程序环境下
+   * wxMuteBackgroundMedia 触发的 video.pause()
+   */
     function preventWxAutoPause() {
 
       // 只处理 iOS
@@ -88,6 +87,8 @@
   </script>
 
   <script>
+    preventWxAutoPause()
+
     var mup = muduPlayer("container");
 
     mup.setup({
