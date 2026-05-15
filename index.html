@@ -5,6 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Document</title>
+  <script src="./vconsole.min.js"></script>
+  <script>new VConsole()</script>
   <script src="https://static.mudu.tv/mudu-player/0.39.14/mudu-player.js"></script>
 </head>
 
@@ -63,6 +65,7 @@
 
       const loop = (now) => {
         const diff = now - lastTime;
+        console.log(now)
 
         /**
          * 异常帧
@@ -123,6 +126,7 @@
         resumeFrames: 3,
       },
       async function () {
+        alert('freezeDetected')
         mup.play()
       }
     );
