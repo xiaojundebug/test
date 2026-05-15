@@ -11,16 +11,121 @@
 <body>
   <div id="container"></div>
   <script>
+    /**
+     * 页面冻结检测（iOS WebView / WebRTC）
+     *
+     * 特点：
+     * 1. 检测短暂通知栏下拉
+     * 2. 不会连续重复触发
+     * 3. 页面恢复后才允许下一次触发
+     * 4. 不依赖 visibilitychange
+     */
+
+    function createPageFreezeDetector(options, callback) {
+      const config = Object.assign(
+        {
+          /**
+           * 单帧超过多少 ms 算异常
+           */
+          frameThreshold: 120,
+
+          /**
+           * 连续多少帧异常认为冻结
+           */
+          consecutiveFrames: 2,
+
+          /**
+           * 连续多少帧正常认为恢复
+           */
+          resumeFrames: 3,
+        },
+        options || {}
+      );
+
+      let rafId = 0;
+
+      let lastTime = performance.now();
+
+      /**
+       * 当前是否处于冻结状态
+       */
+      let frozen = false;
+
+      /**
+       * 连续异常帧
+       */
+      let badFrames = 0;
+
+      /**
+       * 连续正常帧
+       */
+      let goodFrames = 0;
+
+      const loop = (now) => {
+        const diff = now - lastTime;
+
+        /**
+         * 异常帧
+         */
+        if (diff > config.frameThreshold) {
+          badFrames++;
+          goodFrames = 0;
+        } else {
+          goodFrames++;
+          badFrames = 0;
+        }
+
+        /**
+         * 进入冻结状态
+         */
+        if (!frozen && badFrames >= config.consecutiveFrames) {
+          frozen = true;
+
+          callback &&
+            callback({
+              freezeDuration: diff,
+              timestamp: Date.now(),
+            });
+        }
+
+        /**
+         * 恢复正常
+         */
+        if (frozen && goodFrames >= config.resumeFrames) {
+          frozen = false;
+        }
+
+        lastTime = now;
+
+        rafId = requestAnimationFrame(loop);
+      };
+
+      rafId = requestAnimationFrame(loop);
+
+      /**
+       * 返回销毁函数
+       */
+      return function destroy() {
+        cancelAnimationFrame(rafId);
+      };
+    }
+  </script>
+  <script>
     var mup = muduPlayer("container");
     mup.setup({
       file: "//static.mudu.tv/video/productlcps/productlcps.m3u8",
     });
 
-
-
-    document.onvisibilitychange = () => alert('onvisibilitychange')
-    document.onpageshow = () => alert('onpageshow')
-    document.onfocus = () => alert('onfocus')
+    const destroyFreezeDetector = createPageFreezeDetector(
+      {
+        frameThreshold: 120,
+        consecutiveFrames: 2,
+        resumeFrames: 3,
+      },
+      async function () {
+        mup.play()
+      }
+    );
   </script>
 </body>
 
