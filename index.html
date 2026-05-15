@@ -25,26 +25,22 @@
 
   <script>
     /**
-     * 阻止 iOS 微信小程序环境下
-     * wxMuteBackgroundMedia 触发的 video.pause()
+     * 阻止 iOS 微信小程序环境下手动下滑控制中心或通知栏导致的音视频暂停
      */
     function preventWxAutoPause() {
-
       // 只处理 iOS
-      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
+      var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
       // 微信环境
-      const isWechat = /MicroMessenger/i.test(navigator.userAgent);
-
+      var isWechat = /MicroMessenger/i.test(navigator.userAgent);
       // 小程序环境
-      const isMiniProgram =
+      var isMiniProgram =
         window.__wxjs_environment === 'miniprogram';
 
       if (!(isIOS && isWechat && isMiniProgram)) {
         return;
       }
 
-      const proto = HTMLMediaElement.prototype;
+      var proto = HTMLMediaElement.prototype;
 
       // 避免重复 patch
       if (proto.__wx_pause_patched__) {
@@ -53,11 +49,10 @@
 
       proto.__wx_pause_patched__ = true;
 
-      const originalPause = proto.pause;
+      var originalPause = proto.pause;
 
-      proto.pause = function (...args) {
-
-        let stack = '';
+      proto.pause = function () {
+        var stack = '';
 
         try {
           stack = new Error().stack || '';
@@ -67,11 +62,10 @@
          * 微信内部：
          * wxMuteBackgroundMedia
          */
-        const isWxInternalPause =
-          stack.includes('wxMuteBackgroundMedia');
+        var isWxInternalPause =
+          stack.indexOf('wxMuteBackgroundMedia') !== -1;
 
         if (isWxInternalPause) {
-
           console.warn(
             '[preventWxAutoPause] blocked wx auto pause',
             this
@@ -81,16 +75,19 @@
           return Promise.resolve();
         }
 
-        return originalPause.apply(this, args);
+        return originalPause.apply(this, arguments);
       };
 
-
-      document.onvisibilitychange = () => {
+      document.onvisibilitychange = function () {
+        // 页面隐藏时暂停视频，否则小程序关闭了还在播放声音会很奇怪
         if (document.visibilityState === 'hidden') {
-          const videos = document.querySelectorAll('video')
-          videos.forEach(v => v.pause())
+          var videos = document.querySelectorAll('video');
+
+          for (var i = 0; i < videos.length; i++) {
+            videos[i].pause();
+          }
         }
-      }
+      };
     }
   </script>
 
