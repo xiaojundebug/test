@@ -17,6 +17,8 @@
     const originalPlay = proto.play;
 
     proto.pause = function (...args) {
+      console.log(this);
+      
       if (this.tagName === "VIDEO") {
         this.__pausedByManual = true;
       }
