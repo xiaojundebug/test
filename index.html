@@ -11,6 +11,24 @@
 </head>
 
 <body>
+  <script>
+    const proto = HTMLMediaElement.prototype;
+    const originalPause = proto.pause;
+    const originalPlay = proto.play;
+
+    proto.pause = function (...args) {
+      if (this.tagName === "VIDEO") {
+        this.__pausedByManual = true;
+      }
+      return originalPause.apply(this, args);
+    };
+    proto.play = function (...args) {
+      if (this.tagName === "VIDEO") {
+        this.__pausedByManual = false;
+      }
+      return originalPlay.apply(this, args);
+    };
+  </script>
   <div id="container"></div>
   <script>
     var mup = muduPlayer("container");
@@ -19,8 +37,16 @@
     });
 
     setInterval(() => {
-      mup.play()
-    }, 1000);
+      const video = document.querySelector('#container video')
+      const paused = video.paused
+      const pausedByManual = video.__pausedByManual
+
+      console.log(paused, pausedByManual);
+
+      if (paused && !pausedByManual) {
+        mup.play()
+      }
+    }, 100);
   </script>
 </body>
 
