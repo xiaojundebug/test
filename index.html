@@ -12,19 +12,6 @@
 
 <body>
   <script>
-    function ready() {
-      console.log(window.__wxjs_environment === 'miniprogram') // true
-      WeixinJSBridge.on('onPageStateChange', function(res) {
-  console.log('res is active', res.active)
-})
-
-
-    }
-    if (!window.WeixinJSBridge || !WeixinJSBridge.invoke) {
-      document.addEventListener('WeixinJSBridgeReady', ready, false)
-    } else {
-      ready()
-    }
 
   </script>
   <div id="container"></div>
@@ -34,17 +21,17 @@
       file: "//static.mudu.tv/video/productlcps/productlcps.m3u8",
     });
 
-    setInterval(() => {
-      const video = document.querySelector('#container video')
-      const paused = video.paused
-      const pausedByManual = video.__pausedByManual
+    // setInterval(() => {
+    //   const video = document.querySelector('#container video')
+    //   const paused = video.paused
+    //   const pausedByManual = video.__pausedByManual
 
-      console.log(paused, pausedByManual);
+    //   console.log(paused, pausedByManual);
 
-      if (paused && !pausedByManual) {
-        mup.play()
-      }
-    }, 100);
+    //   if (paused && !pausedByManual) {
+    //     mup.play()
+    //   }
+    // }, 100);
   </script>
 </body>
 
