@@ -85,7 +85,7 @@
       };
 
 
-      document.visibilitychange = () => {
+      document.onvisibilitychange = () => {
         if (document.visibilityState === 'hidden') {
           const videos = document.querySelectorAll('video')
           videos.forEach(v => v.pause())
