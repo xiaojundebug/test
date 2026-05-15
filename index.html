@@ -19,7 +19,7 @@
 
     proto.pause = function (...args) {
       console.log('pause', this, args)
-      return originalPause.apply(this, args);
+      // return originalPause.apply(this, args);
     };
     proto.play = function (...args) {
       return originalPlay.apply(this, args);
