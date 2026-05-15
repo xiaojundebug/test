@@ -12,24 +12,20 @@
 
 <body>
   <script>
-    const proto = HTMLMediaElement.prototype;
-    const originalPause = proto.pause;
-    const originalPlay = proto.play;
+    function ready() {
+      console.log(window.__wxjs_environment === 'miniprogram') // true
+      WeixinJSBridge.on('onPageStateChange', function(res) {
+  console.log('res is active', res.active)
+})
 
-    proto.pause = function (...args) {
-      console.log(this);
-      
-      if (this.tagName === "VIDEO") {
-        this.__pausedByManual = true;
-      }
-      return originalPause.apply(this, args);
-    };
-    proto.play = function (...args) {
-      if (this.tagName === "VIDEO") {
-        this.__pausedByManual = false;
-      }
-      return originalPlay.apply(this, args);
-    };
+
+    }
+    if (!window.WeixinJSBridge || !WeixinJSBridge.invoke) {
+      document.addEventListener('WeixinJSBridgeReady', ready, false)
+    } else {
+      ready()
+    }
+
   </script>
   <div id="container"></div>
   <script>
