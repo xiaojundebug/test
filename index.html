@@ -63,7 +63,9 @@
           stack = new Error().stack || '';
         } catch (e) { }
 
-        console.log(stack, document.visibilityState)
+        setTimeout(() => {
+          console.log(stack, document.visibilityState)
+        }, 1000);
 
         /**
          * 微信内部：
