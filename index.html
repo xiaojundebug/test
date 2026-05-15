@@ -11,6 +11,7 @@
 </head>
 
 <body>
+
   <script>
     const proto = HTMLMediaElement.prototype;
     const originalPause = proto.pause;
@@ -37,9 +38,9 @@
 
       console.log(paused);
 
-      if (paused) {
-        mup.play()
-      }
+      // if (paused) {
+      //   mup.play()
+      // }
     }, 100);
   </script>
 </body>
