@@ -63,6 +63,8 @@
           stack = new Error().stack || '';
         } catch (e) { }
 
+        console.log(stack, document.visibilityState)
+
         /**
          * 微信内部：
          * wxMuteBackgroundMedia
