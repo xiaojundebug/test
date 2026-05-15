@@ -18,6 +18,11 @@
     const originalPlay = proto.play;
 
     proto.pause = function (...args) {
+      try {
+        console.log(new Error().stack);
+      } catch (error) {
+
+      }
       console.log('pause', this, args)
       // return originalPause.apply(this, args);
     };
