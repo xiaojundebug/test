@@ -2,13 +2,22 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Document</title>
+  <script src="https://static.mudu.tv/mudu-player/0.39.14/mudu-player.js"></script>
 </head>
 
 <body>
+  <div id="container"></div>
   <script>
+    var mup = muduPlayer("container");
+    mup.setup({
+      file: "//static.mudu.tv/video/productlcps/productlcps.m3u8",
+    });
+
+
+
     document.onvisibilitychange = () => {
       alert(document.visibilityState)
     };
