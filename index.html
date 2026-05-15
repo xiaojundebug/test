@@ -12,7 +12,17 @@
 
 <body>
   <script>
+    const proto = HTMLMediaElement.prototype;
+    const originalPause = proto.pause;
+    const originalPlay = proto.play;
 
+    proto.pause = function (...args) {
+      console.log('pause', this, args)
+      return originalPause.apply(this, args);
+    };
+    proto.play = function (...args) {
+      return originalPlay.apply(this, args);
+    };
   </script>
   <div id="container"></div>
   <script>
@@ -21,17 +31,16 @@
       file: "//static.mudu.tv/video/productlcps/productlcps.m3u8",
     });
 
-    // setInterval(() => {
-    //   const video = document.querySelector('#container video')
-    //   const paused = video.paused
-    //   const pausedByManual = video.__pausedByManual
+    setInterval(() => {
+      const video = document.querySelector('#container video')
+      const paused = video.paused
 
-    //   console.log(paused, pausedByManual);
+      console.log(paused);
 
-    //   if (paused && !pausedByManual) {
-    //     mup.play()
-    //   }
-    // }, 100);
+      if (paused) {
+        mup.play()
+      }
+    }, 100);
   </script>
 </body>
 
